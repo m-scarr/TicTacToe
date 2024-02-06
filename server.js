@@ -12,7 +12,7 @@ import { Server } from 'socket.io';
 import socketHandlers from './socket_handlers/index.js';
 
 const app = express();
-const server = createServer(app)
+const server = createServer(app);
 const port = 3000;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -24,7 +24,7 @@ app.use(passport.session());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-passportConfig(app, db)
+passportConfig(app, db);
 
 app.get('/', (_req, res) => {
     res.sendFile(path.join(__dirname, 'dist', 'index.html'));
@@ -44,19 +44,15 @@ io.use(wrap(passport.initialize()));
 io.use(wrap(passport.session()));
 
 io.use((socket, next) => {
-    if (socket.request.user) {
-        next();
-    } else {
-        next(new Error('unauthorized'))
-    }
+    next((socket.request.user) ? undefined : new Error('Attempted unauthorized socket use.'));
 });
-export const sockets = {}
+
+export const sockets = {};
+
 io.on('connect', (socket) => {
-    console.log(`new connection ${socket.id}`);
     const socketActions = socketHandlers(socket);
-    const session = socket.request.session;
-    session.socketId = socket.id;
-    session.save();
+    socket.request.session.socketId = socket.id;
+    socket.request.session.save();
     sockets[socket.request.user.id.toString()] = socket;
     socket.on('disconnect', () => {
         delete sockets[socket.request.user.id.toString()];
