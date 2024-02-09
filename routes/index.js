@@ -7,7 +7,8 @@ const router = express.Router();
 router.use(
     "/auth",
     (req, res, next) => {
-        req.isAuthenticated() ? next() : res.redirect("/");
+        console.log(req.isAuthenticated());
+        req.isAuthenticated() ? next() : res.json("Not Authenticated");
     },
     authorizedRoutes
 );

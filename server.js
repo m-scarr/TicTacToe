@@ -24,7 +24,7 @@ app.use(passport.session());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-passportConfig(app, db);
+passportConfig(db);
 
 app.get('/', (_req, res) => {
     res.sendFile(path.join(__dirname, 'dist', 'index.html'));

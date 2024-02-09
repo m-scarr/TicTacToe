@@ -1,15 +1,10 @@
-/*var passport = require("passport"),
-  LocalStrategy = require("passport-local").Strategy,
-  bcrypt = require("bcrypt");*/
 import passport from "passport";
 import passportLocal from "passport-local";
 import bcrypt from "bcrypt";
 
 const LocalStrategy = passportLocal.Strategy;
 
-export default (app, db) => {
-  app.use(passport.initialize());
-  app.use(passport.session());
+export default (db) => {
   passport.use(
     new LocalStrategy(
       { usernameField: "username", passwordField: "password" },
@@ -19,7 +14,10 @@ export default (app, db) => {
             username,
           },
         }).then((user) => {
-          const hashedPassword = bcrypt.hashSync(password, user !== null ? user.salt : "");
+          let hashedPassword;
+          if (user !== null) {
+            hashedPassword = bcrypt.hashSync(password, user.salt);
+          }
           return (user !== null && user.dataValues.password === hashedPassword) ?
             done(null, {
               id: user.dataValues.id,
@@ -46,7 +44,7 @@ export default (app, db) => {
       if (user == null) {
         done(new Error("Something went wrong!"));
       } else {
-        done(null, user.dataValues);
+        done(null, user);
       }
     });
   });
