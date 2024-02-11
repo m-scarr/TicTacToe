@@ -53,9 +53,21 @@ io.on('connect', (socket) => {
     const socketActions = socketHandlers(socket);
     socket.request.session.socketId = socket.id;
     socket.request.session.save();
-    sockets[socket.request.user.id.toString()] = socket;
+    if (socket.request.user.id.toString() in sockets) {
+        sockets[socket.request.user.id.toString()].push(socket);
+    } else {
+        sockets[socket.request.user.id.toString()] = [socket];
+        sockets[socket.request.user.id.toString()].emit = (name, data) => {
+            sockets[socket.request.user.id.toString()].forEach((_socket) => {
+                _socket.emit(name, data);
+            });
+        }
+    }
     socket.on('disconnect', () => {
-        delete sockets[socket.request.user.id.toString()];
+        const deleteIndex = sockets[socket.request.user.id.toString()].indexOf(socket);
+        if (deleteIndex !== -1) {
+            sockets[socket.request.user.id.toString()].splice(deleteIndex, 1);
+        }
     });
 });
 
