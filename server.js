@@ -48,26 +48,33 @@ io.use((socket, next) => {
 });
 
 export const sockets = {};
+let socketActions = {};
 
 io.on('connect', (socket) => {
-    const socketActions = socketHandlers(socket);
-    socket.request.session.socketId = socket.id;
-    socket.request.session.save();
+    socketActions = socketHandlers(socket);
+    const session = socket.request.session;
+    session.socketId = socket.id;
+    session.save();
     if (socket.request.user.id.toString() in sockets) {
-        sockets[socket.request.user.id.toString()].push(socket);
+        sockets[socket.request.user.id.toString()].sockets.push(socket);
     } else {
-        sockets[socket.request.user.id.toString()] = [socket];
-        sockets[socket.request.user.id.toString()].emit = (name, data) => {
-            sockets[socket.request.user.id.toString()].forEach((_socket) => {
-                _socket.emit(name, data);
-            });
-        }
+        sockets[socket.request.user.id.toString()] = {
+            sockets: [socket],
+            emit: (name, data) => {
+                sockets[socket.request.user.id.toString()].sockets.forEach((_socket) => {
+                    _socket.emit(name, data);
+                });
+            }
+        };
     }
     socket.on('disconnect', () => {
-        const deleteIndex = sockets[socket.request.user.id.toString()].indexOf(socket);
+        const deleteIndex = sockets[socket.request.user.id.toString()].sockets.indexOf(socket);
         if (deleteIndex !== -1) {
-            sockets[socket.request.user.id.toString()].splice(deleteIndex, 1);
+            sockets[socket.request.user.id.toString()].sockets.splice(deleteIndex, 1);
         }
+        Object.keys(socket.rooms).forEach((room) => {
+            socket.leave(room);
+        });
     });
 });
 
