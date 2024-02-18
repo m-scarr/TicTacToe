@@ -13,13 +13,13 @@ import db from "./models/index.js";
 import { Server } from 'socket.io';
 import socketHandlers from './socket_handlers/index.js';
 
-let redisClient = createClient()
-redisClient.connect().catch(console.error)
+let redisClient = createClient();
+redisClient.connect().catch(console.error);
 
 let redisStore = new RedisStore({
     client: redisClient,
     prefix: "tictactoe:",
-})
+});
 
 const app = express();
 const server = createServer(app);
