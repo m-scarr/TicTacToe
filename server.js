@@ -1,6 +1,7 @@
 import express from "express";
 import { createServer } from "http";
 import { createClient } from "redis";
+import redisAdapter from 'socket.io-redis';
 import RedisStore from "connect-redis"
 import session from "express-session";
 import bodyParser from "body-parser";
@@ -13,9 +14,10 @@ import db from "./models/index.js";
 import { Server } from 'socket.io';
 import socketHandlers from './socket_handlers/index.js';
 
-let redisClient = createClient();
-redisClient.connect().catch(console.error);
-
+const redisClient = createClient();
+await redisClient.connect();
+const subClient = redisClient.duplicate();
+await subClient.connect();
 let redisStore = new RedisStore({
     client: redisClient,
     prefix: "tictactoe:",
@@ -49,6 +51,7 @@ const wrap = (middleware) => { //close to socket.io
     }
 }
 
+io.adapter(redisAdapter(redisClient, subClient ));
 io.use(wrap(sessionMiddleware));
 io.use(wrap(passport.initialize()));
 io.use(wrap(passport.session()));
@@ -57,7 +60,7 @@ io.use((socket, next) => {
     next((socket.request.user) ? undefined : new Error('Attempted unauthorized socket use.'));
 });
 
-export const userSocketMap = {};    //THIS NEEDS TO BE STORED ON THE REDIS
+export const userSocketMap = {};    //THIS NEEDS TO BE STORED ON THE REDIS, we may not need it at all actually depending on how we handle matches
 export let socketActions = {};
 
 io.on('connect', (socket) => {
