@@ -26,8 +26,7 @@ let redisStore = new RedisStore({
 const app = express();
 const server = createServer(app);
 const port = 3000;
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const __dirname = dirname(fileURLToPath(import.meta.url));
 app.use(express.static(path.join(__dirname, 'dist')));
 const sessionMiddleware = session({ store: redisStore, secret: sessionSecret, resave: false, saveUninitialized: false, cookie: { secure: false }, });
 app.use(sessionMiddleware);
@@ -51,7 +50,7 @@ const wrap = (middleware) => { //close to socket.io
     }
 }
 
-io.adapter(redisAdapter(redisClient, subClient ));
+io.adapter(redisAdapter(redisClient, subClient));
 io.use(wrap(sessionMiddleware));
 io.use(wrap(passport.initialize()));
 io.use(wrap(passport.session()));
