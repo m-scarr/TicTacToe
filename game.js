@@ -58,16 +58,16 @@ class Game {
             const symbol = (i === 0 ? "X" : "O");
             for (let x = 0; x < 2; x++) {
                 if (this.grid[x][0] === symbol && this.grid[x][1] === symbol && this.grid[x][2] === symbol) {
-                    return players[symbol];
+                    return this.players[symbol];
                 }
             }
             for (let y = 0; y < 2; y++) {
                 if (this.grid[0][y] === symbol && this.grid[1][y] === symbol && this.grid[2][y] === symbol) {
-                    return players[symbol];
+                    return this.players[symbol];
                 }
             }
             if (this.grid[1][1] === symbol && ((this.grid[0][0] === symbol && this.grid[2][2] === symbol) || (this.grid[2][0] === symbol && this.grid[0][2] === symbol))) {
-                return players[symbol];
+                return this.players[symbol];
             }
         }
         return null;
