@@ -1,5 +1,7 @@
 import express from "express";
 import { createServer } from "http";
+import { createClient } from "redis";
+import RedisStore from "connect-redis"
 import session from "express-session";
 import bodyParser from "body-parser";
 import path, { dirname } from "path"
@@ -11,13 +13,21 @@ import db from "./models/index.js";
 import { Server } from 'socket.io';
 import socketHandlers from './socket_handlers/index.js';
 
+let redisClient = createClient()
+redisClient.connect().catch(console.error)
+
+let redisStore = new RedisStore({
+    client: redisClient,
+    prefix: "tictactoe:",
+})
+
 const app = express();
 const server = createServer(app);
 const port = 3000;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 app.use(express.static(path.join(__dirname, 'dist')));
-const sessionMiddleware = session({ secret: sessionSecret, resave: false, saveUninitialized: false, cookie: { secure: false }, });
+const sessionMiddleware = session({ store: redisStore, secret: sessionSecret, resave: false, saveUninitialized: false, cookie: { secure: false }, });
 app.use(sessionMiddleware);
 app.use(passport.initialize());
 app.use(passport.session());
