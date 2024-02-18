@@ -57,14 +57,11 @@ io.use((socket, next) => {
     next((socket.request.user) ? undefined : new Error('Attempted unauthorized socket use.'));
 });
 
-export const userSocketMap = {};
+export const userSocketMap = {};    //THIS NEEDS TO BE STORED ON THE REDIS
 export let socketActions = {};
 
 io.on('connect', (socket) => {
     socketActions = socketHandlers(socket);
-    const session = socket.request.session;
-    session.socketId = socket.id;
-    session.save();
     if (socket.request.user.id.toString() in userSocketMap) {
         userSocketMap[socket.request.user.id.toString()].sockets.push(socket);
     } else {

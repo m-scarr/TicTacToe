@@ -44,14 +44,17 @@ export default {
         },
         logOut: (req, res) => {
             const socketId = req.session.socketId;
-            if (socketId && io.of("/").sockets.get(socketId)) {
-                io.of("/").sockets.get(socketId).disconnect(true); //disconnect socket if it isnt already
+            if (socketId) {
+                const socket = io.of("/").sockets.get(socketId);
+                if (socket) {
+                    socket.disconnect();
+                }
             }
             req.logout(function (err) {
                 if (err) {
                     console.error(err);
                 }
-                res.cookie("connect.sid", "", { expires: new Date() }); //clear the cookie
+                res.clearCookie("connect.sid");
                 res.json(true);
             });
         },
