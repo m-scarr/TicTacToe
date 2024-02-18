@@ -38,10 +38,11 @@ export default (db) => {
       },
       attributes: ["id", "username", "profilePic"],
     }).then(function (user) {
-      if (user == null) {
-        done(new Error("Something went wrong!"));
-      } else {
+      if (user !== null) {
         done(null, { id: user.dataValues.id, username: user.dataValues.username, profilePic: user.dataValues.profilePic, displayName: user.dataValues.displayName, role: user.dataValues.role });
+      } else {
+        console.error(`User ${id} not found for deserialization.`);
+        done(new Error("Something went wrong!"));
       }
     }).catch((err) => {
       console.error(err);
