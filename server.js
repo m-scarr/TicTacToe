@@ -44,7 +44,7 @@ app.use(routes);
 
 export const io = new Server(server);
 
-const wrap = (middleware) => { //close to socket.io
+const wrap = (middleware) => {
     return (socket, next) => {
         middleware(socket.request, {}, next);
     }
