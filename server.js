@@ -4,9 +4,9 @@ import { createClient } from "redis";
 import RedisStore from "connect-redis"
 import session from "express-session";
 import bodyParser from "body-parser";
-import path, { dirname } from "path"
+import path, { dirname } from "path";
 import { fileURLToPath } from 'url';
-import routes from "./routes/index.js"
+import routes from "./routes/index.js";
 import passport from "passport";
 import passportConfig, { sessionSecret } from "./config/passport.js";
 import db from "./models/index.js";
@@ -43,7 +43,7 @@ app.use(routes);
 
 export const io = new Server(server);
 
-const wrap = (middleware) => {
+const wrap = (middleware) => { //close to socket.io
     return (socket, next) => {
         middleware(socket.request, {}, next);
     }

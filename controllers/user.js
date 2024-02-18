@@ -40,7 +40,7 @@ export default {
     },
     authorized: {
         update: async (req, res) => {
-
+            res.json()
         },
         logOut: (req, res) => {
             const socketId = req.session.socketId;
