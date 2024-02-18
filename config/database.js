@@ -8,7 +8,7 @@ export default {
         "dialect": "mysql"
     },
     "test": {
-        "username": "",
+        "username": "wegaweg",
         "password": "",
         "database": "",
         "port": "3306",
