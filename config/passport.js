@@ -15,7 +15,7 @@ export default (db) => {
           },
         }).then(async (user) => {
           if (user !== null && await bcrypt.compare(password, user.dataValues.password)) {
-            done(null, { id: user.dataValues.id, username: user.dataValues.username, profilePic: user.dataValues.profilePic });
+            done(null, { id: user.dataValues.id, username: user.dataValues.username, profilePic: user.dataValues.profilePic, displayName: user.dataValues.displayName, role: user.dataValues.role });
           } else {
             done(null, false, { message: "Log In failed, invalid credentials." });
           }
@@ -41,7 +41,7 @@ export default (db) => {
       if (user == null) {
         done(new Error("Something went wrong!"));
       } else {
-        done(null, { id: user.dataValues.id, username: user.dataValues.username, profilePic: user.dataValues.profilePic });
+        done(null, { id: user.dataValues.id, username: user.dataValues.username, profilePic: user.dataValues.profilePic, displayName: user.dataValues.displayName, role: user.dataValues.role });
       }
     }).catch((err) => {
       console.error(err);
