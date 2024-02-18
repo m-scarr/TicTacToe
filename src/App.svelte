@@ -15,6 +15,7 @@
     };
 
     onMount(async () => {
+        API.init();
         const result = await API.user.isLoggedIn();
         if (result.data.success) {
             user = result.data.user;

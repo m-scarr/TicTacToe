@@ -3,11 +3,13 @@ import { Socket } from "socket.io-client";
 
 export default (socket: Socket) => {
     //const message = messageSocketHandlers(socket);
-
+    socket.on("exampleActionResponse", (res: any) => {
+        alert(res);
+    })
     const actions = {
         //...message
         testAction: () => {
-            socket.emit("testAction", "Hello!");
+            socket.emit("exampleAction", "Hello!");
         }
     }
 

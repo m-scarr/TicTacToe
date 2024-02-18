@@ -8,10 +8,6 @@
 </script>
 
 <main>
-    <button on:click={() => {
-        API.socketActions.testAction()
-    }}>Test button</button>
-
     Tic Tac Toe
     <hr />
     <input type="text" bind:value={username} /><br />
