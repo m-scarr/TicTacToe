@@ -13,11 +13,12 @@ export default (db) => {
           where: {
             username,
           },
-        }).then((user) => {
-          return (user !== null && bcrypt.compare(user.dataValues.password, password)) ?
-            done(null, { id: user.dataValues.id, username: user.dataValues.username, profilePic: user.dataValues.profilePic })
-            :
+        }).then(async (user) => {
+          if (user !== null && await bcrypt.compare(password, user.dataValues.password)) {
+            done(null, { id: user.dataValues.id, username: user.dataValues.username, profilePic: user.dataValues.profilePic });
+          } else {
             done(null, false, { message: "Log In failed, invalid credentials." });
+          }
         }).catch((err) => {
           console.error(err);
           done(null, false, { message: `Log In failed.` });
