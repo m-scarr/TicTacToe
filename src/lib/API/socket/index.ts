@@ -6,6 +6,9 @@ export default (socket: Socket) => {
 
     const actions = {
         //...message
+        testAction: () => {
+            socket.emit("testAction", "Hello!");
+        }
     }
 
     return actions;

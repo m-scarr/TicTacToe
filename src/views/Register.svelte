@@ -38,10 +38,10 @@
 <main>
     Tic Tac Toe
     <hr />
-    username<input type="text" bind:value={username} /><br />
-    password<input type="password" bind:value={password} /><br />
-    verifyPassword<input type="password" bind:value={verifyPassword} /><br />
-    email<input type="text" bind:value={email} /><br />
+    <input type="text" placeholder="Username" bind:value={username} /><br />
+    <input type="password" placeholder="Password" bind:value={password} /><br />
+    <input type="password" placeholder="Verify Password" bind:value={verifyPassword} /><br />
+    <input type="text" placeholder="E-mail" bind:value={email} /><br />
     <button on:click={handleRegister}>Create Account</button>
     <button
         on:click={() => {
