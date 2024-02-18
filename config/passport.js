@@ -5,6 +5,7 @@ import bcrypt from "bcrypt";
 const LocalStrategy = passportLocal.Strategy;
 
 export default (db) => {
+  
   passport.use(
     new LocalStrategy(
       { usernameField: "username", passwordField: "password" },
