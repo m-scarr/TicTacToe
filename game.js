@@ -23,7 +23,7 @@ class Game {
     ];
     players = {
         X: null,
-        Y: null
+        O: null
     }
 
     static create(player1Id, player2Id) {
@@ -31,10 +31,10 @@ class Game {
         newGame.turn = Math.random() < .5 ? "X" : "O";
         if (Math.random < .5) {
             newGame.players.X = player1Id;
-            newGame.players.Y = player2Id;
+            newGame.players.O = player2Id;
         } else {
             newGame.players.X = player2Id;
-            newGame.players.Y = player1Id;
+            newGame.players.O = player1Id;
         }
         return newGame;
     }
@@ -51,6 +51,10 @@ class Game {
     placeSymbol(x, y) {
         this.grid[x][y] = this.turn;
         this.turn = (this.turn === "X" ? "O" : "X");
+    }
+
+    checkForTurn(playerId) {
+        return ((this.players.X === playerId && this.turn === "X") || (this.players.O === playerId && this.turn === "O"))
     }
 
     checkForVictor() {
