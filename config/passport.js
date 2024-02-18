@@ -5,7 +5,6 @@ import bcrypt from "bcrypt";
 const LocalStrategy = passportLocal.Strategy;
 
 export default (db) => {
-  
   passport.use(
     new LocalStrategy(
       { usernameField: "username", passwordField: "password" },
@@ -15,17 +14,13 @@ export default (db) => {
             username,
           },
         }).then((user) => {
-          let hashedPassword;
-          if (user !== null) {
-            hashedPassword = bcrypt.hashSync(password, user.salt);
-          }
-          return (user !== null && user.dataValues.password === hashedPassword) ?
-            done(null, {
-              id: user.dataValues.id,
-              username: user.dataValues.username,
-            })
+          return (user !== null && bcrypt.compare(user.dataValues.password, password)) ?
+            done(null, { id: user.dataValues.id, username: user.dataValues.username, profilePic: user.dataValues.profilePic })
             :
             done(null, false, { message: "Log In failed, invalid credentials." });
+        }).catch((err) => {
+          console.error(err);
+          done(null, false, { message: `Log In failed.` });
         });
       }
     )
@@ -45,12 +40,15 @@ export default (db) => {
       if (user == null) {
         done(new Error("Something went wrong!"));
       } else {
-        done(null, user);
+        done(null, { id: user.dataValues.id, username: user.dataValues.username, profilePic: user.dataValues.profilePic });
       }
+    }).catch((err) => {
+      console.error(err);
+      done(new Error("Something went wrong!"));
     });
   });
 
   return passport;
 };
 
-export const sessionSecret = "mQ7g2$Lz5sFpRvT9"
+export const sessionSecret = "mQ7g2$Lz5sFpRvT9";
