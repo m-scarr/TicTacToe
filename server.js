@@ -59,11 +59,12 @@ io.use((socket, next) => {
     next((socket.request.user) ? undefined : new Error('Attempted unauthorized socket use.'));
 });
 
-export let findSocketByUser = () => {};
+export let findSocketByUser = () => { };
 
 io.on('connect', (socket) => {
     //this disallows players from logging into their profile from multiple devices or browsers.
-    io.sockets.sockets.forEach((_socket) => {
+    for (let i = 0; i < [...io.sockets.sockets].length; i++) {
+        const _socket = [...io.sockets.sockets][i][1];
         if (socket !== _socket && socket.request.user.id === _socket.request.user.id) {
             socket.emit("alreadyLoggedIn", null);
             socket.request.logout(function (err) {
@@ -72,12 +73,13 @@ io.on('connect', (socket) => {
                 }
                 socket.disconnect(true);
             });
+            break;
         }
-    });
+    }
 
     findSocketByUser = (id) => {
-        for (let i = 0; i < io.sockets.sockets.length; i++) {
-            const _socket = io.sockets.sockets[i];
+        for (let i = 0; i < [...io.sockets.sockets].length; i++) {
+            const _socket = [...io.sockets.sockets][i][1];
             if (_socket.request.user.id === id) {
                 return _socket;
             }
