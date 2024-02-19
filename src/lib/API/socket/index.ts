@@ -9,8 +9,9 @@ export default (socket: Socket) => {
 
     socket.on("alreadyLoggedIn", () => {
         alert("This user is already logged in!");
+        window.location.href = "/";
     });
-    
+
     const actions = {
         //...message
         testAction: () => {

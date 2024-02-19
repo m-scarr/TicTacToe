@@ -14,8 +14,6 @@ export default class API {
         API.socketActions = generateSocketActions(socket);
         axios.defaults.baseURL = "http://localhost:3000";
         axios.defaults.withCredentials = true;
-        API.user.isLoggedIn();
-
     }
 
     static user = {

@@ -59,8 +59,6 @@ io.use((socket, next) => {
     next((socket.request.user) ? undefined : new Error('Attempted unauthorized socket use.'));
 });
 
-export let socketActions = {};
-
 export let findSocketByUser = () => {};
 
 io.on('connect', (socket) => {
@@ -76,7 +74,7 @@ io.on('connect', (socket) => {
             });
         }
     });
-    
+
     findSocketByUser = (id) => {
         for (let i = 0; i < io.sockets.sockets.length; i++) {
             const _socket = io.sockets.sockets[i];
@@ -87,7 +85,7 @@ io.on('connect', (socket) => {
         return null;
     }
 
-    socketActions = socketHandlers(socket);
+    socketHandlers(socket);
 
     socket.on('disconnect', () => {
         Object.keys(socket.rooms).forEach((room) => {

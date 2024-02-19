@@ -4,7 +4,7 @@
     import { View } from "../lib/types";
 
     let username = "user1234567";
-    let password = "pass1";
+    let password = "password";
 </script>
 
 <main>
