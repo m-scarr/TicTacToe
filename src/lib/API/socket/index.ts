@@ -14,6 +14,12 @@ export default (socket: Socket) => {
         window.location.href = "/";
     });
 
+    socket.on("newLogIn", () => {
+        userStore.set(null);
+        alert("This user has logged in in another location!");
+        window.location.href = "/";
+    });
+
     const actions = {
         //...message
         testAction: () => {

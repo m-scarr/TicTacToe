@@ -66,12 +66,12 @@ io.on('connect', (socket) => {
     for (let i = 0; i < [...io.sockets.sockets].length; i++) {
         const _socket = [...io.sockets.sockets][i][1];
         if (socket !== _socket && socket.request.user.id === _socket.request.user.id) {
-            socket.emit("alreadyLoggedIn", null);
-            socket.request.logout(function (err) {
+            _socket.emit("newLogIn", null);
+            _socket.request.logout(function (err) {
                 if (err) {
                     console.error(err);
                 }
-                socket.disconnect(true);
+                _socket.disconnect(true);
             });
             break;
         }
