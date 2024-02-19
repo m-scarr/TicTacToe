@@ -1,6 +1,6 @@
 <script lang="ts">
     import API from "../lib/API";
-    export let changeView: Function;
+    import { currentViewStore } from "../lib/store";
     import { View } from "../lib/types";
 
     let username = "user1234567";
@@ -19,7 +19,7 @@
     >
     <button
         on:click={() => {
-            changeView(View.Register);
+            currentViewStore.set(View.Register);
         }}>Create an Account</button
     >
 </main>

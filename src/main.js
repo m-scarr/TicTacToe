@@ -4,4 +4,3 @@ var app = new App({
     target: document.getElementById('root'),
 });
 export default app;
-//# sourceMappingURL=main.js.main
