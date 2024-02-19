@@ -62,8 +62,6 @@ io.use((socket, next) => {
 export let socketActions = {};
 
 io.on('connect', (socket) => {
-    socketActions = socketHandlers(socket);
-
     //this disallows players from logging into their profile from multiple devices or browsers.
     io.sockets.sockets.forEach((_socket) => {
         if (socket !== _socket && socket.request.user.id === _socket.request.user.id) {
@@ -77,6 +75,8 @@ io.on('connect', (socket) => {
         }
     });
 
+    socketActions = socketHandlers(socket);
+    
     socket.on('disconnect', () => {
         Object.keys(socket.rooms).forEach((room) => {
             socket.leave(room);
