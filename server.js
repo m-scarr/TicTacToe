@@ -67,11 +67,11 @@ io.on('connect', (socket) => {
     //this disallows players from logging into their profile from multiple devices or browsers.
     io.sockets.sockets.forEach((_socket) => {
         if (socket !== _socket && socket.request.user.id === _socket.request.user.id) {
+            socket.emit("alreadyLoggedIn", null);
             socket.request.logout(function (err) {
                 if (err) {
                     console.error(err);
                 }
-                //socket.emit here to throw an error on the client
                 socket.disconnect(true);
             });
         }

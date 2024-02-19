@@ -5,7 +5,12 @@ export default (socket: Socket) => {
     //const message = messageSocketHandlers(socket);
     socket.on("exampleActionResponse", (res: any) => {
         alert(res);
-    })
+    });
+
+    socket.on("alreadyLoggedIn", () => {
+        alert("This user is already logged in!");
+    });
+    
     const actions = {
         //...message
         testAction: () => {
