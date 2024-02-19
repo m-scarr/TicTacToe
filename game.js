@@ -14,7 +14,7 @@ function parseJSONRecursively(jsonString) {
 }
 
 
-class Game {
+export class Game {
     turn;
     grid = [
         [null, null, null],
@@ -49,8 +49,12 @@ class Game {
     }
 
     placeSymbol(x, y) {
-        this.grid[x][y] = this.turn;
-        this.turn = (this.turn === "X" ? "O" : "X");
+        if (x >= 0 && y >= 0 && x < 3 && y < 3 && this.grid[x][y] === null) {
+            this.grid[x][y] = this.turn;
+            this.turn = (this.turn === "X" ? "O" : "X");
+            return true;
+        }
+        return false;
     }
 
     checkForTurn(playerId) {
