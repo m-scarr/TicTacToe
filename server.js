@@ -59,28 +59,25 @@ io.use((socket, next) => {
     next((socket.request.user) ? undefined : new Error('Attempted unauthorized socket use.'));
 });
 
-export const userSocketMap = {};    //THIS NEEDS TO BE STORED ON THE REDIS, we may not need it at all actually depending on how we handle matches
 export let socketActions = {};
 
 io.on('connect', (socket) => {
     socketActions = socketHandlers(socket);
-    if (socket.request.user.id.toString() in userSocketMap) {
-        userSocketMap[socket.request.user.id.toString()].sockets.push(socket);
-    } else {
-        userSocketMap[socket.request.user.id.toString()] = {
-            sockets: [socket],
-            emit: (name, data) => {
-                userSocketMap[socket.request.user.id.toString()].sockets.forEach((_socket) => {
-                    _socket.emit(name, data);
-                });
-            }
-        };
-    }
-    socket.on('disconnect', () => {
-        const deleteIndex = userSocketMap[socket.request.user.id.toString()].sockets.indexOf(socket);
-        if (deleteIndex !== -1) {
-            userSocketMap[socket.request.user.id.toString()].sockets.splice(deleteIndex, 1);
+
+    //this disallows players from logging into their profile from multiple devices or browsers.
+    io.sockets.sockets.forEach((_socket) => {
+        if (socket !== _socket && socket.request.user.id === _socket.request.user.id) {
+            socket.request.logout(function (err) {
+                if (err) {
+                    console.error(err);
+                }
+                //socket.emit here to throw an error on the client
+                socket.disconnect(true);
+            });
         }
+    });
+
+    socket.on('disconnect', () => {
         Object.keys(socket.rooms).forEach((room) => {
             socket.leave(room);
         });
