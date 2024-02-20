@@ -1,19 +1,3 @@
-function parseJSONRecursively(jsonString) {
-    return JSON.parse(jsonString, (key, value) => {
-        if (typeof value === 'object' && value !== null) {
-            return Object.entries(value).reduce((acc, [nestedKey, nestedValue]) => {
-                acc[nestedKey] = parseJSONRecursively(nestedValue);
-                return acc;
-            }, {});
-        } else if (Array.isArray(value)) {
-            return value.map(element => parseJSONRecursively(element));
-        } else {
-            return value;
-        }
-    });
-}
-
-
 export class Game {
     turn;
     grid = [
@@ -40,7 +24,7 @@ export class Game {
     }
 
     static parse(gameString) {
-        const gameData = parseJSONRecursively(gameString);
+        const gameData = JSON.parse(gameString);
         const newGame = new Game();
         newGame.turn = gameData.turn;
         newGame.grid = gameData.grid;
