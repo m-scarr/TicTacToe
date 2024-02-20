@@ -46,14 +46,18 @@ export class Game {
     }
 
     checkForVictor() {
-        for (let i = 0; i < 1; i++) {
+        let spacesAvailable = false;
+        for (let i = 0; i < 2; i++) {
             const symbol = (i === 0 ? "X" : "O");
-            for (let x = 0; x < 2; x++) {
+            for (let x = 0; x < 3; x++) {
                 if (this.grid[x][0] === symbol && this.grid[x][1] === symbol && this.grid[x][2] === symbol) {
                     return this.players[symbol];
                 }
+                if (!spacesAvailable && (this.grid[x][0] === null || this.grid[x][1] === null || this.grid[x][2] === null)) {
+                    spacesAvailable = true;
+                }
             }
-            for (let y = 0; y < 2; y++) {
+            for (let y = 0; y < 3; y++) {
                 if (this.grid[0][y] === symbol && this.grid[1][y] === symbol && this.grid[2][y] === symbol) {
                     return this.players[symbol];
                 }
@@ -62,7 +66,7 @@ export class Game {
                 return this.players[symbol];
             }
         }
-        return null;
+        return spacesAvailable ? null : -1;
     }
 
     toString() {
