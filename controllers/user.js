@@ -21,7 +21,6 @@ export default {
                     displayName: req.body.username,
                     email: req.body.email,
                     password: bcrypt.hashSync(req.body.password, salt),
-                    salt: salt,
                     ...limitAttributes(req.body, ["displayName"])
                 });
                 res.json(newUser);
