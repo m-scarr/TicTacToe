@@ -106,7 +106,7 @@ io.on('connect', async (socket) => {
 
     socket.on('disconnect', async () => {
         if (socket.request.user !== null) {
-            await redisClient.del(`/users/sockets/${socket.request.user.id.toString()}`);
+            await redisClient.del(`/users/socket/${socket.request.user.id.toString()}`);
             const gameName = await redisClient.get(`/users/gameRef/${socket.request.user.id.toString()}`);
             if (gameName !== null) {
                 const gameData = await redisClient.get(`/games/${gameName}`);
