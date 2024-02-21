@@ -13,8 +13,9 @@ import passportConfig, { sessionSecret } from "./config/passport.js";
 import db from "./models/index.js";
 import { Server } from 'socket.io';
 import socketHandlers from './socket_handlers/index.js';
+import { Game } from "./socket_handlers/game.js";
 
-const redisClient = createClient();
+export const redisClient = createClient({ host: "localhost:3536" });
 await redisClient.connect();
 const subClient = redisClient.duplicate();
 await subClient.connect();
@@ -61,38 +62,64 @@ io.use((socket, next) => {
 
 export let findSocketByUser = () => { };
 
-io.on('connect', (socket) => {
-    //this disallows players from logging into their profile from multiple devices or browsers.
-    for (let i = 0; i < [...io.sockets.sockets].length; i++) {
-        const _socket = [...io.sockets.sockets][i][1];
-        if (socket !== _socket && socket.request.user.id === _socket.request.user.id) {
-            _socket.emit("newLogIn", null);
-            _socket.request.logout(function (err) {
-                if (err) {
-                    console.error(err);
-                }
-                _socket.disconnect(true);
-            });
-            break;
-        }
-    }
+io.on('connect', async (socket) => {
 
-    findSocketByUser = (id) => {
-        for (let i = 0; i < [...io.sockets.sockets].length; i++) {
-            const _socket = [...io.sockets.sockets][i][1];
-            if (_socket.request.user.id === id) {
-                return _socket;
+    const sameUserOtherSocket = await findSocketByUser(socket.request.user.id);
+    if (typeof sameUserOtherSocket !== "undefined" && sameUserOtherSocket !== null) {
+        sameUserOtherSocket.emit("newLogIn", null);
+        const gameName = await redisClient.get(`/users/gameRef/${sameUserOtherSocket.request.user.id.toString()}`);
+        if (gameName !== null) {
+            const gameData = await redisClient.get(`/games/${gameName}`);
+            if (gameData !== null) {
+                const game = Game.parse(gameData);
+                const otherSocket = await findSocketByUser(game.players.X === sameUserOtherSocket.request.user.id ? game.players.O : game.players.X);
+                //socket.request.user loses streak
+                otherSocket.emit("error", "Your opponent left.");
+                await game.delete();
             }
         }
-        return null;
+        sameUserOtherSocket.request.logout(async function (err) {
+            if (err) {
+                console.error(err);
+            }
+            sameUserOtherSocket.disconnect(true);
+        })
+    }
+
+    await redisClient.set(`/users/socket/${socket.request.user.id.toString()}`, socket.id);
+
+    findSocketByUser = async (id) => {
+        const userSocketId = await redisClient.get(`/users/socket/${id.toString()}`);
+        if (userSocketId !== null) {
+            const userSocket = io.of("/").sockets.get(userSocketId);
+            if (userSocket) {
+                return userSocket;
+            } else {
+                return null;
+            }
+        } else {
+            return null;
+        }
     }
 
     socketHandlers(socket);
 
-    socket.on('disconnect', () => {
-        Object.keys(socket.rooms).forEach((room) => {
-            socket.leave(room);
-        });
+    socket.on('disconnect', async () => {
+        if (socket.request.user !== null) {
+            await redisClient.del(`/users/sockets/${socket.request.user.id.toString()}`);
+            const gameName = await redisClient.get(`/users/gameRef/${socket.request.user.id.toString()}`);
+            if (gameName !== null) {
+                const gameData = await redisClient.get(`/games/${gameName}`);
+                if (gameData !== null) {
+                    const game = Game.parse(gameData);
+                    const otherSocket = await findSocketByUser(game.players.X === socket.request.user.id ? game.players.O : game.players.X);
+                    if (otherSocket !== null) {
+                        otherSocket.emit("error", "Your opponent left.");
+                    }
+                    await game.delete();
+                }
+            }
+        }
     });
 });
 

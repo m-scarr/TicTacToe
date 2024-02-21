@@ -6,8 +6,8 @@
 <main>
     <button
         on:click={() => {
-            API.socketActions.testAction();
-        }}>Test button</button
+            API.socketActions.readyForGame();
+        }}>Ready For Game</button
     >
     lobby
     <button on:click={API.user.logOut}>Log Out</button>

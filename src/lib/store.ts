@@ -14,6 +14,8 @@ export const waitingForOpponent = writable<boolean>(false);
 
 export const playerSymbolStore = writable<Symbol | null>(null);
 
+export const playerStore = writable<{ X: number, O: number }>({ X: -1, O: -1 })
+
 export const turnStore = writable<Symbol | null>(null);
 
 export const userStore = writable<null | User>(null);
@@ -26,6 +28,7 @@ export const updateGame = (game: any) => {
     } else if (user && game.players.O === user.id) {
         playerSymbolStore.set("O");
     }
+    playerStore.set(game.players);
     turnStore.set(game.turn);
 }
 

@@ -8,8 +8,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json",
-    "watch:client": "onchange \"./src/**/*.tsx\" \"./src/**/*.ts\" \"./src/**/*.svelte\" -- npm run build",
-    "watch:server": "nodemon --watch server.js --watch routes --watch controllers --watch config --watch socket --watch models --exec node server.js"
+    "watch:client": "onchange \"./src/**/*.tsx\" \"./src/**/*.ts\" \"./src/**/*.svelte\" -- vite build",
+    "watch:server": "nodemon --watch server.js --watch routes --watch controllers --watch config --watch socket_handlers --watch models --exec node server.js"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^3.0.1",
