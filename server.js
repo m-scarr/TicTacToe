@@ -17,10 +17,6 @@ import { Server } from 'socket.io';
 import socketHandlers from './socket_handlers/index.js';
 import { Game } from "./socket_handlers/game.js";
 
-export const redisClient = createClient({ host: "localhost:3536" });
-await redisClient.connect();
-const subClient = redisClient.duplicate();
-await subClient.connect();
 let redisStore = new RedisStore({
     client: redisClient,
     prefix: "tictactoe:",
