@@ -67,17 +67,17 @@ io.on('connect', async (socket) => {
     const sameUserOtherSocket = await findSocketByUser(socket.request.user.id);
     if (typeof sameUserOtherSocket !== "undefined" && sameUserOtherSocket !== null) {
         sameUserOtherSocket.emit("newLogIn", null);
-        const gameName = await redisClient.get(`/users/gameRef/${sameUserOtherSocket.request.user.id.toString()}`);
-        if (gameName !== null) {
-            const gameData = await redisClient.get(`/games/${gameName}`);
-            if (gameData !== null) {
-                const game = Game.parse(gameData);
-                const otherSocket = await findSocketByUser(game.players.X === sameUserOtherSocket.request.user.id ? game.players.O : game.players.X);
-                //socket.request.user loses streak
+
+        const game = await Game.get(socket.request.user.id);
+        if (game !== null) {
+            const otherSocket = await findSocketByUser(game.players.X === sameUserOtherSocket.request.user.id ? game.players.O : game.players.X);
+            //socket.request.user loses streak
+            if (typeof otherSocket !== "undefined" && otherSocket !== null) {
                 otherSocket.emit("error", "Your opponent left.");
-                await game.delete();
             }
+            await game.delete();
         }
+
         sameUserOtherSocket.request.logout(async function (err) {
             if (err) {
                 console.error(err);
@@ -107,17 +107,13 @@ io.on('connect', async (socket) => {
     socket.on('disconnect', async () => {
         if (socket.request.user !== null) {
             await redisClient.del(`/users/socket/${socket.request.user.id.toString()}`);
-            const gameName = await redisClient.get(`/users/gameRef/${socket.request.user.id.toString()}`);
-            if (gameName !== null) {
-                const gameData = await redisClient.get(`/games/${gameName}`);
-                if (gameData !== null) {
-                    const game = Game.parse(gameData);
-                    const otherSocket = await findSocketByUser(game.players.X === socket.request.user.id ? game.players.O : game.players.X);
-                    if (otherSocket !== null) {
-                        otherSocket.emit("error", "Your opponent left.");
-                    }
-                    await game.delete();
+            const game = await Game.get(socket.request.user.id);
+            if (game !== null) {
+                const otherSocket = await findSocketByUser(game.players.X === socket.request.user.id ? game.players.O : game.players.X);
+                if (otherSocket !== null) {
+                    otherSocket.emit("error", "Your opponent left.");
                 }
+                await game.delete();
             }
         }
     });

@@ -12,7 +12,8 @@ export class Game {
         O: null
     }
 
-    static create(player1Id, player2Id) {
+    static async create(player1Id, player2Id) {
+        const gameName = (player1Id > player2Id) ? `${player1Id}_${player2Id}` : `${player2Id}_${player1Id}`;
         const newGame = new Game();
         newGame.turn = Math.random() < .5 ? "X" : "O";
         if (Math.random < .5) {
@@ -23,29 +24,43 @@ export class Game {
             newGame.players.O = player1Id;
         }
         console.log("turn: " + newGame.turn);
+        await redisClient.set(`/games/${gameName}`, newGame.toString());
+        await redisClient.set(`/users/gameRef/${player1Id}`, gameName);
+        await redisClient.set(`/users/gameRef/${player2Id}`, gameName);
         return newGame;
     }
 
-    static parse(gameString) {
-        const gameData = JSON.parse(gameString);
-        const newGame = new Game();
-        newGame.turn = gameData.turn
-        newGame.grid = gameData.grid;
-        newGame.players = gameData.players;
-        return newGame;
+    static async get(userId) {
+        const gameName = await redisClient.get(`/users/gameRef/${userId}`)
+        if (gameName !== null) {
+            const gameString = await redisClient.get(`/games/${gameName}`);
+            if (gameString !== null) {
+                const gameData = JSON.parse(gameString);
+                const newGame = new Game();
+                newGame.turn = gameData.turn;
+                newGame.grid = gameData.grid;
+                newGame.players = gameData.players;
+                return newGame;
+            } else {
+                return null;
+            }
+        } else {
+            return null
+        }
     }
 
-    placeSymbol(x, y) {
+    async placeSymbol(x, y) {
         if (x >= 0 && y >= 0 && x < 3 && y < 3 && this.grid[x][y] === null) {
             this.grid[x][y] = this.turn;
             this.turn = (this.turn === "X" ? "O" : "X");
+            const gameName = this.players.O > this.players.X ? `${this.players.O}_${this.players.X}` : `${this.players.X}_${this.players.O}`;
+            await redisClient.set(`/games/${gameName}`, this.toString());
             return true;
         }
         return false;
     }
 
     checkForTurn(playerId) {
-        console.log("turn: " + this.turn);
         return ((this.players.X.toString() === playerId.toString() && this.turn === "X") || (this.players.O.toString() === playerId.toString() && this.turn === "O"))
     }
 
