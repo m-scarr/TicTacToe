@@ -5,7 +5,6 @@ import redisAdapter from 'socket.io-redis';
 import RedisStore from "connect-redis"
 import session from "express-session";
 import redis from 'redis';
-import connectRedis from 'connect-redis';
 
 import bodyParser from "body-parser";
 import path, { dirname } from "path";
@@ -30,7 +29,6 @@ let redisStore = new RedisStore({
 const app = express();
 const server = createServer(app);
 const port = 3000;
-const RedisStore = connectRedis;
 const redisClient = redis.createClient({
     host: 'localhost',
     port: 6379
