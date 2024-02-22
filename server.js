@@ -37,11 +37,9 @@ redisClient.on('connect', function (err) {
     console.log('Connected to redis successfully');
 });
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-app.use(express.static(path.join(__dirname, 'dist')));
 const sessionMiddleware = session({
-    store: new RedisStore({ client: redisClient }),
-    secret: 'secret$%^134',
+    store: redisStore,
+    secret: sessionSecret,
     resave: false,
     saveUninitialized: false,
     cookie: {
@@ -52,7 +50,6 @@ const sessionMiddleware = session({
 });
 const __dirname = dirname(fileURLToPath(import.meta.url));
 app.use(express.static(path.join(__dirname, 'dist')));
-const sessionMiddleware = session({ store: redisStore, secret: sessionSecret, resave: false, saveUninitialized: false, cookie: { secure: false }, });
 app.use(sessionMiddleware);
 app.use(passport.initialize());
 app.use(passport.session());
