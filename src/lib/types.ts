@@ -4,6 +4,9 @@ export enum View {
     LogIn,
     Register,
     Lobby,
-    Game,
-    Leaderboard
+    Game
 }
+
+export type Symbol = "X" | "O";
+
+export type GameGrid = [[null | Symbol, null | Symbol, null | Symbol], [null | Symbol, null | Symbol, null | Symbol], [null | Symbol, null | Symbol, null | Symbol]];

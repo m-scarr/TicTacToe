@@ -13,18 +13,15 @@ export default (db) => {
           where: {
             username,
           },
-        }).then((user) => {
-          let hashedPassword;
-          if (user !== null) {
-            hashedPassword = bcrypt.hashSync(password, user.salt);
-          }
-          return (user !== null && user.dataValues.password === hashedPassword) ?
-            done(null, {
-              id: user.dataValues.id,
-              username: user.dataValues.username,
-            })
-            :
+        }).then(async (user) => {
+          if (user !== null && await bcrypt.compare(password, user.dataValues.password)) {
+            done(null, { id: user.dataValues.id, username: user.dataValues.username, profilePic: user.dataValues.profilePic, displayName: user.dataValues.displayName, role: user.dataValues.role });
+          } else {
             done(null, false, { message: "Log In failed, invalid credentials." });
+          }
+        }).catch((err) => {
+          console.error(err);
+          done(null, false, { message: `Log In failed.` });
         });
       }
     )
@@ -41,15 +38,19 @@ export default (db) => {
       },
       attributes: ["id", "username", "profilePic"],
     }).then(function (user) {
-      if (user == null) {
-        done(new Error("Something went wrong!"));
+      if (user !== null) {
+        done(null, { id: user.dataValues.id, username: user.dataValues.username, profilePic: user.dataValues.profilePic, displayName: user.dataValues.displayName, role: user.dataValues.role });
       } else {
-        done(null, user);
+        console.error(`User ${id} not found for deserialization.`);
+        done(new Error("Something went wrong!"));
       }
+    }).catch((err) => {
+      console.error(err);
+      done(new Error("Something went wrong!"));
     });
   });
 
   return passport;
 };
 
-export const sessionSecret = "mQ7g2$Lz5sFpRvT9"
+export const sessionSecret = "mQ7g2$Lz5sFpRvT9";

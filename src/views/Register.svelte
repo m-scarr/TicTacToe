@@ -1,7 +1,7 @@
 <script lang="ts">
     import API from "../lib/API";
+    import { currentViewStore } from "../lib/store";
     import { View } from "../lib/types";
-    export let changeView: Function;
 
     let username = "";
     let password = "";
@@ -38,14 +38,18 @@
 <main>
     Tic Tac Toe
     <hr />
-    <input type="text" bind:value={username} /><br />
-    <input type="text" bind:value={password} /><br />
-    <input type="text" bind:value={verifyPassword} /><br />
-    <input type="text" bind:value={email} /><br />
+    <input type="text" placeholder="Username" bind:value={username} /><br />
+    <input type="password" placeholder="Password" bind:value={password} /><br />
+    <input
+        type="password"
+        placeholder="Verify Password"
+        bind:value={verifyPassword}
+    /><br />
+    <input type="text" placeholder="E-mail" bind:value={email} /><br />
     <button on:click={handleRegister}>Create Account</button>
     <button
         on:click={() => {
-            changeView(View.LogIn);
+            currentViewStore.set(View.LogIn);
         }}>I already have an account!</button
     >
 </main>

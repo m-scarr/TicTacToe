@@ -1,22 +1,36 @@
 import express from "express";
 import { createServer } from "http";
+import { createClient } from "redis";
+import redisAdapter from 'socket.io-redis';
+import RedisStore from "connect-redis"
 import session from "express-session";
 import redis from 'redis';
 import connectRedis from 'connect-redis';
 
 import bodyParser from "body-parser";
-import path, { dirname } from "path"
+import path, { dirname } from "path";
 import { fileURLToPath } from 'url';
-import routes from "./routes/index.js"
+import routes from "./routes/index.js";
 import passport from "passport";
 import passportConfig, { sessionSecret } from "./config/passport.js";
 import db from "./models/index.js";
 import { Server } from 'socket.io';
 import socketHandlers from './socket_handlers/index.js';
+import { Game } from "./socket_handlers/game.js";
+
+export const redisClient = createClient({ host: "localhost:3536" });
+await redisClient.connect();
+const subClient = redisClient.duplicate();
+await subClient.connect();
+let redisStore = new RedisStore({
+    client: redisClient,
+    prefix: "tictactoe:",
+});
 
 const app = express();
 const server = createServer(app);
 const port = 3000;
+<<<<<<< HEAD
 const RedisStore = connectRedis;
 const redisClient = redis.createClient({
     host: 'localhost',
@@ -43,12 +57,17 @@ const sessionMiddleware = session({
         maxAge: 1000 * 60 * 10 // session max age in miliseconds
     }
 });
+=======
+const __dirname = dirname(fileURLToPath(import.meta.url));
+app.use(express.static(path.join(__dirname, 'dist')));
+const sessionMiddleware = session({ store: redisStore, secret: sessionSecret, resave: false, saveUninitialized: false, cookie: { secure: false }, });
+>>>>>>> 3d112c30f8f5c833ac93d95cc32064f736339ffe
 app.use(sessionMiddleware);
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-//test
+
 passportConfig(db);
 
 app.get('/', (_req, res) => {
@@ -64,6 +83,7 @@ const wrap = (middleware) => {
     }
 }
 
+io.adapter(redisAdapter(redisClient, subClient));
 io.use(wrap(sessionMiddleware));
 io.use(wrap(passport.initialize()));
 io.use(wrap(passport.session()));
@@ -72,34 +92,62 @@ io.use((socket, next) => {
     next((socket.request.user) ? undefined : new Error('Attempted unauthorized socket use.'));
 });
 
-export const sockets = {};
-let socketActions = {};
+export let findSocketByUser = () => { };
 
-io.on('connect', (socket) => {
-    socketActions = socketHandlers(socket);
-    const session = socket.request.session;
-    session.socketId = socket.id;
-    session.save();
-    if (socket.request.user.id.toString() in sockets) {
-        sockets[socket.request.user.id.toString()].sockets.push(socket);
-    } else {
-        sockets[socket.request.user.id.toString()] = {
-            sockets: [socket],
-            emit: (name, data) => {
-                sockets[socket.request.user.id.toString()].sockets.forEach((_socket) => {
-                    _socket.emit(name, data);
-                });
+io.on('connect', async (socket) => {
+
+    const sameUserOtherSocket = await findSocketByUser(socket.request.user.id);
+    if (typeof sameUserOtherSocket !== "undefined" && sameUserOtherSocket !== null) {
+        sameUserOtherSocket.emit("newLogIn", null);
+
+        const game = await Game.get(socket.request.user.id);
+        if (game !== null) {
+            const otherSocket = await findSocketByUser(game.players.X === sameUserOtherSocket.request.user.id ? game.players.O : game.players.X);
+            //socket.request.user loses streak
+            if (typeof otherSocket !== "undefined" && otherSocket !== null) {
+                otherSocket.emit("error", "Your opponent left.");
             }
-        };
-    }
-    socket.on('disconnect', () => {
-        const deleteIndex = sockets[socket.request.user.id.toString()].sockets.indexOf(socket);
-        if (deleteIndex !== -1) {
-            sockets[socket.request.user.id.toString()].sockets.splice(deleteIndex, 1);
+            await game.delete();
         }
-        Object.keys(socket.rooms).forEach((room) => {
-            socket.leave(room);
-        });
+
+        sameUserOtherSocket.request.logout(async function (err) {
+            if (err) {
+                console.error(err);
+            }
+            sameUserOtherSocket.disconnect(true);
+        })
+    }
+
+    await redisClient.set(`/users/socket/${socket.request.user.id.toString()}`, socket.id);
+
+    findSocketByUser = async (id) => {
+        const userSocketId = await redisClient.get(`/users/socket/${id.toString()}`);
+        if (userSocketId !== null) {
+            const userSocket = io.of("/").sockets.get(userSocketId);
+            if (userSocket) {
+                return userSocket;
+            } else {
+                return null;
+            }
+        } else {
+            return null;
+        }
+    }
+
+    socketHandlers(socket);
+
+    socket.on('disconnect', async () => {
+        if (socket.request.user !== null) {
+            await redisClient.del(`/users/socket/${socket.request.user.id.toString()}`);
+            const game = await Game.get(socket.request.user.id);
+            if (game !== null) {
+                const otherSocket = await findSocketByUser(game.players.X === socket.request.user.id ? game.players.O : game.players.X);
+                if (otherSocket !== null) {
+                    otherSocket.emit("error", "Your opponent left.");
+                }
+                await game.delete();
+            }
+        }
     });
 });
 

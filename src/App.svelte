@@ -5,40 +5,35 @@
     import Game from "./views/Game.svelte";
     import API from "./lib/API";
     import { onMount } from "svelte";
-    import { type User, View } from "./lib/types";
+    import { View } from "./lib/types";
+    import { currentViewStore, userStore } from "./lib/store";
+    import { get } from "svelte/store";
 
-    let currentView: View = View.LogIn;
-    let user: null | User = null;
-
-    const changeView = (view: View) => {
-        currentView = view;
-    };
+    $: user = $userStore;
 
     onMount(async () => {
-        const result = await API.user.isLoggedIn();
-        if (result.data.success) {
-            user = result.data.user;
-        }
+        await API.init();
     });
-    
     $: {
-        if (user !== null) {
-            if (currentView === View.LogIn || currentView === View.Register) {
-                currentView = View.Lobby;
-            }
+        if (
+            user !== null &&
+            (get(currentViewStore) === View.LogIn ||
+                get(currentViewStore) === View.Register)
+        ) {
+            currentViewStore.set(View.Lobby);
         }
     }
 </script>
 
 <main>
-    {#if currentView === View.LogIn}
-        <LogIn {changeView} />
-    {:else if currentView === View.Register}
-        <Register {changeView} />
-    {:else if currentView === View.Lobby}
-        <Lobby {user} {changeView} />
-    {:else if currentView === View.Game}
-        <Game {user} {changeView} />
+    {#if $currentViewStore === View.LogIn}
+        <LogIn />
+    {:else if $currentViewStore === View.Register}
+        <Register />
+    {:else if $currentViewStore === View.Lobby}
+        <Lobby />
+    {:else if $currentViewStore === View.Game}
+        <Game />
     {/if}
 </main>
 

@@ -21,7 +21,6 @@ export default {
                     displayName: req.body.username,
                     email: req.body.email,
                     password: bcrypt.hashSync(req.body.password, salt),
-                    salt: salt,
                     ...limitAttributes(req.body, ["displayName"])
                 });
                 res.json(newUser);
@@ -40,18 +39,21 @@ export default {
     },
     authorized: {
         update: async (req, res) => {
-
+            res.json()
         },
         logOut: (req, res) => {
             const socketId = req.session.socketId;
-            if (socketId && io.of("/").sockets.get(socketId)) {
-                io.of("/").sockets.get(socketId).disconnect(true); //disconnect socket if it isnt already
+            if (socketId) {
+                const socket = io.of("/").sockets.get(socketId);
+                if (socket) {
+                    socket.disconnect();
+                }
             }
             req.logout(function (err) {
                 if (err) {
                     console.error(err);
                 }
-                res.cookie("connect.sid", "", { expires: new Date() }); //clear the cookie
+                res.clearCookie("connect.sid");
                 res.json(true);
             });
         },

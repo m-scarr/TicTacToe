@@ -1,8 +1,8 @@
 export default (sequelize, DataTypes) => {
     const User = sequelize.define("User", {
-        type: {
-            type: DataTypes.ENUM('admin', 'user', 'moderator'),
-            defaultValue: 'user'
+        role: {
+            type: DataTypes.ENUM('Administrator', 'User', 'Moderator'),
+            defaultValue: 'User'
         },
         username: {
             type: DataTypes.STRING,
@@ -22,10 +22,6 @@ export default (sequelize, DataTypes) => {
             allowNull: false
         },
         password: {
-            type: DataTypes.STRING,
-            allowNull: false
-        },
-        salt: {
             type: DataTypes.STRING,
             allowNull: false
         },
