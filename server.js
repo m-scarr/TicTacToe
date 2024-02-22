@@ -27,6 +27,9 @@ let redisStore = new RedisStore({
     prefix: "tictactoe:",
 });
 
+const subClient = redisClient.duplicate();
+await subClient.connect();
+
 const app = express();
 const server = createServer(app);
 const port = 3000;
