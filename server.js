@@ -57,11 +57,9 @@ const sessionMiddleware = session({
         maxAge: 1000 * 60 * 10 // session max age in miliseconds
     }
 });
-=======
 const __dirname = dirname(fileURLToPath(import.meta.url));
 app.use(express.static(path.join(__dirname, 'dist')));
 const sessionMiddleware = session({ store: redisStore, secret: sessionSecret, resave: false, saveUninitialized: false, cookie: { secure: false }, });
->>>>>>> 3d112c30f8f5c833ac93d95cc32064f736339ffe
 app.use(sessionMiddleware);
 app.use(passport.initialize());
 app.use(passport.session());
