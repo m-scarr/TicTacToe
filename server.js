@@ -25,11 +25,11 @@ let redisStore = new RedisStore({
 const app = express();
 const server = createServer(app);
 const port = 3000;
-const redisClient = redis.createClient({
+export const redisClient = redis.createClient({
     host: 'localhost',
     port: 6379
 });
-redisClient.connect();
+await redisClient.connect();
 redisClient.on('error', function (err) {
     console.log('Could not establish a connection with redis. ' + err);
 });
