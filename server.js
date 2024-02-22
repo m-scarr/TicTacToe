@@ -17,6 +17,11 @@ import { Server } from 'socket.io';
 import socketHandlers from './socket_handlers/index.js';
 import { Game } from "./socket_handlers/game.js";
 
+export const redisClient = redis.createClient({
+    host: 'localhost',
+    port: 6379
+});
+await redisClient.connect();
 let redisStore = new RedisStore({
     client: redisClient,
     prefix: "tictactoe:",
@@ -25,11 +30,7 @@ let redisStore = new RedisStore({
 const app = express();
 const server = createServer(app);
 const port = 3000;
-export const redisClient = redis.createClient({
-    host: 'localhost',
-    port: 6379
-});
-await redisClient.connect();
+
 redisClient.on('error', function (err) {
     console.log('Could not establish a connection with redis. ' + err);
 });
