@@ -30,7 +30,6 @@ let redisStore = new RedisStore({
 const app = express();
 const server = createServer(app);
 const port = 3000;
-<<<<<<< HEAD
 const RedisStore = connectRedis;
 const redisClient = redis.createClient({
     host: 'localhost',
