@@ -1,6 +1,9 @@
 import express from "express";
 import { createServer } from "http";
 import session from "express-session";
+import redis from 'redis';
+import connectRedis from 'connect-redis';
+
 import bodyParser from "body-parser";
 import path, { dirname } from "path"
 import { fileURLToPath } from 'url';
@@ -14,10 +17,32 @@ import socketHandlers from './socket_handlers/index.js';
 const app = express();
 const server = createServer(app);
 const port = 3000;
+const RedisStore = connectRedis;
+const redisClient = redis.createClient({
+    host: 'localhost',
+    port: 6379
+});
+redisClient.connect();
+redisClient.on('error', function (err) {
+    console.log('Could not establish a connection with redis. ' + err);
+});
+redisClient.on('connect', function (err) {
+    console.log('Connected to redis successfully');
+});
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 app.use(express.static(path.join(__dirname, 'dist')));
-const sessionMiddleware = session({ secret: sessionSecret, resave: false, saveUninitialized: false });
+const sessionMiddleware = session({
+    store: new RedisStore({ client: redisClient }),
+    secret: 'secret$%^134',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        secure: false, // if true only transmit cookie over https
+        httpOnly: false, // if true prevent client side JS from reading the cookie
+        maxAge: 1000 * 60 * 10 // session max age in miliseconds
+    }
+});
 app.use(sessionMiddleware);
 app.use(passport.initialize());
 app.use(passport.session());
