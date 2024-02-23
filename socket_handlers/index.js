@@ -5,7 +5,7 @@ import { Game } from "./game.js";
 export default (socket) => {
     socket.on("exampleAction", (string) => {
         socket.emit("exampleActionResponse", `You said "${string}" to the server and the server and the server just wanted to say hi back.`)
-    })
+    });
 
     socket.on("readyForGame", async () => {
         await socket.join("lobby");
@@ -22,7 +22,8 @@ export default (socket) => {
                 break;
             }
         }
-    })
+    });
+    
     socket.on("takeTurn", async ({ x, y }) => {
         const game = await Game.get(socket.request.user.id);
         if (game.checkForTurn(socket.request.user.id)) {

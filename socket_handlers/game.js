@@ -98,11 +98,4 @@ export class Game {
         await redisClient.del(`/players/gameRef/${this.players.X.toString()}`);
         await redisClient.del(`/players/gameRef/${this.players.O.toString()}`);
     }
-    static async delete(gameName) {
-        const gameData = await redisClient.get(`/games/${gameName}`);
-        const game = Game.parse(gameData);
-        await redisClient.del(`/games/${gameName}`);
-        await redisClient.del(`/players/gameRef/${game.players.X.toString()}`);
-        await redisClient.del(`/players/gameRef/${game.players.O.toString()}`);
-    }
 }

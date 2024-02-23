@@ -60,7 +60,19 @@ io.use((socket, next) => {
     next((socket.request.user) ? undefined : new Error('Attempted unauthorized socket use.'));
 });
 
-export let findSocketByUser = () => { };
+export const findSocketByUser = async (id) => {
+    const userSocketId = await redisClient.get(`/users/socket/${id.toString()}`);
+    if (userSocketId !== null) {
+        const userSocket = io.of("/").sockets.get(userSocketId);
+        if (userSocket) {
+            return userSocket;
+        } else {
+            return null;
+        }
+    } else {
+        return null;
+    }
+}
 
 io.on('connect', async (socket) => {
 
@@ -87,20 +99,6 @@ io.on('connect', async (socket) => {
     }
 
     await redisClient.set(`/users/socket/${socket.request.user.id.toString()}`, socket.id);
-
-    findSocketByUser = async (id) => {
-        const userSocketId = await redisClient.get(`/users/socket/${id.toString()}`);
-        if (userSocketId !== null) {
-            const userSocket = io.of("/").sockets.get(userSocketId);
-            if (userSocket) {
-                return userSocket;
-            } else {
-                return null;
-            }
-        } else {
-            return null;
-        }
-    }
 
     socketHandlers(socket);
 
