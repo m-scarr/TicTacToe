@@ -4,6 +4,8 @@ import { createClient } from "redis";
 import redisAdapter from 'socket.io-redis';
 import RedisStore from "connect-redis"
 import session from "express-session";
+import redis from 'redis';
+
 import bodyParser from "body-parser";
 import path, { dirname } from "path";
 import { fileURLToPath } from 'url';
@@ -15,21 +17,43 @@ import { Server } from 'socket.io';
 import socketHandlers from './socket_handlers/index.js';
 import { Game } from "./socket_handlers/game.js";
 
-export const redisClient = createClient({ host: "localhost:3536" });
+export const redisClient = redis.createClient({
+    host: 'localhost',
+    port: 6379
+});
 await redisClient.connect();
-const subClient = redisClient.duplicate();
-await subClient.connect();
 let redisStore = new RedisStore({
     client: redisClient,
     prefix: "tictactoe:",
 });
 
+const subClient = redisClient.duplicate();
+await subClient.connect();
+
 const app = express();
 const server = createServer(app);
 const port = 3000;
+
+redisClient.on('error', function (err) {
+    console.log('Could not establish a connection with redis. ' + err);
+});
+redisClient.on('connect', function (err) {
+    console.log('Connected to redis successfully');
+});
+const __filename = fileURLToPath(import.meta.url);
+const sessionMiddleware = session({
+    store: redisStore,
+    secret: sessionSecret,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        secure: false, // if true only transmit cookie over https
+        httpOnly: false, // if true prevent client side JS from reading the cookie
+        maxAge: 1000 * 60 * 10 // session max age in miliseconds
+    }
+});
 const __dirname = dirname(fileURLToPath(import.meta.url));
 app.use(express.static(path.join(__dirname, 'dist')));
-const sessionMiddleware = session({ store: redisStore, secret: sessionSecret, resave: false, saveUninitialized: false, cookie: { secure: false }, });
 app.use(sessionMiddleware);
 app.use(passport.initialize());
 app.use(passport.session());
