@@ -40,7 +40,6 @@ redisClient.on('error', function (err) {
 redisClient.on('connect', function (err) {
     console.log('Connected to redis successfully');
 });
-const __filename = fileURLToPath(import.meta.url);
 const sessionMiddleware = session({
     store: redisStore,
     secret: sessionSecret,
