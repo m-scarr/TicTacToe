@@ -10,7 +10,7 @@
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    const handleRegister = () => {
+    const handleRegister = async () => {
         if (username.length < 8) {
             alert("Your username must be atleast 8 characters!");
         }
@@ -31,7 +31,13 @@
             alert("You didn't enter a valid e-mail!");
             return;
         }
-        API.user.create(username, password, email);
+        const result = await API.user.create(username, password, email);
+        if (result) {
+            alert("Register successful!");
+            currentViewStore.set(View.LogIn);
+        } else {
+            alert("Register failed, the username or email may already be in use!");
+        }
     };
 </script>
 

@@ -8,12 +8,12 @@ export default class API {
     static socketActions: any;
 
     static async init() {
-        const socket: Socket = io('http://'+window.location.hostname+':3000', {
+        const socket: Socket = io('http://' + window.location.hostname + ':3000', {
             withCredentials: true,
             transports: ["websocket"],
         });
         API.socketActions = generateSocketActions(socket);
-        axios.defaults.baseURL = "http://"+window.location.hostname+":3000";
+        axios.defaults.baseURL = "http://" + window.location.hostname + ":3000";
         axios.defaults.withCredentials = true;
         const result = await API.user.isLoggedIn();
         if (result.data.success) {
@@ -23,8 +23,17 @@ export default class API {
 
     static user = {
         create: async (username: string, password: string, email: string) => {
-            const response = await axios.post("/user/create", { username, password, email });
-            return response;
+            try {
+                const response = await axios.post("/user/create", { username, password, email });
+                console.log(response)
+                if (response.data !== false) {
+                    return true
+                } else {
+                    return false;
+                }
+            } catch (err) {
+                return false;
+            }
         },
         isLoggedIn: async () => {
             const response = await axios.get("/user/isLoggedIn")
@@ -32,13 +41,16 @@ export default class API {
             return response;
         },
         logIn: async (username: string, password: string) => {
-            await axios.post("/user/logIn", { username, password });
-            window.location.href = "/";
+            try {
+                await axios.post("/user/logIn", { username, password });
+                window.location.href = "/";
+            } catch (err) {
+                alert("Log in failed!");
+            }
         },
         update: async (_data: any) => { },
         logOut: async () => {
-            const res = await axios.delete("/auth/user/logOut");
-            console.log(res)
+            await axios.delete("/auth/user/logOut");
             window.location.href = "/";
         },
     }
