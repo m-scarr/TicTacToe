@@ -40,7 +40,6 @@ redisClient.on('error', function (err) {
 redisClient.on('connect', function (err) {
     console.log('Connected to redis successfully');
 });
-const __filename = fileURLToPath(import.meta.url);
 const sessionMiddleware = session({
     store: redisStore,
     secret: sessionSecret,
@@ -49,7 +48,7 @@ const sessionMiddleware = session({
     cookie: {
         secure: false, // if true only transmit cookie over https
         httpOnly: false, // if true prevent client side JS from reading the cookie
-        maxAge: 1000 * 60 * 10 // session max age in miliseconds
+        maxAge: 1000 * 60 * 60 * 10 // session max age in miliseconds
     }
 });
 const __dirname = dirname(fileURLToPath(import.meta.url));
