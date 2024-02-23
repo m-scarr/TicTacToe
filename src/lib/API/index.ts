@@ -8,12 +8,12 @@ export default class API {
     static socketActions: any;
 
     static async init() {
-        const socket: Socket = io('http://localhost:3000', {
+        const socket: Socket = io('http://'+window.location.hostname+':3000', {
             withCredentials: true,
             transports: ["websocket"],
         });
         API.socketActions = generateSocketActions(socket);
-        axios.defaults.baseURL = "http://localhost:3000";
+        axios.defaults.baseURL = "http://"+window.location.hostname+":3000";
         axios.defaults.withCredentials = true;
         const result = await API.user.isLoggedIn();
         if (result.data.success) {
