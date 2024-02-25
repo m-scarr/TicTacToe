@@ -13,17 +13,16 @@ export default {
             );
         },
         create: async (req, res) => {
-            console.log(req.body)
             try {
                 const salt = bcrypt.genSaltSync(10);
-                const newUser = await db.User.create({
+                await db.User.create({
                     username: req.body.username,
                     displayName: req.body.username,
                     email: req.body.email,
                     password: bcrypt.hashSync(req.body.password, salt),
                     ...limitAttributes(req.body, ["displayName"])
                 });
-                res.json(newUser);
+                res.json(true);
             } catch (err) {
                 console.error(err);
                 res.json(false);

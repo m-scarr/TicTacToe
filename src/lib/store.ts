@@ -32,3 +32,23 @@ export const updateGame = (game: any) => {
     turnStore.set(game.turn);
 }
 
+export const updateUser = (user: any) => {
+    console.log(user);
+    let highScore;
+    let currentScore;
+    for (let i = 0; i < 2; i++) {
+        if (user.scores[i].highScore === 1) {
+            highScore = user.scores[i].streak;
+        } else {
+            currentScore = user.scores[i].streak;
+        }
+    }
+    userStore.set({
+        id: user.id,
+        username: user.username,
+        profilePic: user.profilePic,
+        highScore,
+        currentScore
+    });
+}
+

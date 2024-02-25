@@ -1,5 +1,5 @@
 import { findSocketByUser, io } from "../server.js";
-import { redisClient } from "../server.js";
+import scoreController from "../controllers/score.js";
 import { Game } from "./game.js";
 
 export default (socket) => {
@@ -23,7 +23,7 @@ export default (socket) => {
             }
         }
     });
-    
+
     socket.on("takeTurn", async ({ x, y }) => {
         const game = await Game.get(socket.request.user.id);
         if (game.checkForTurn(socket.request.user.id)) {
@@ -33,7 +33,10 @@ export default (socket) => {
                 if (victor !== null) {
                     socket.emit("gameOver", victor === -1 ? null : (victor === socket.request.user.id));
                     otherSocket.emit("gameOver", victor === -1 ? null : (victor === otherSocket.request.user.id));
-                    //add db interaction
+                    if (victor !== -1) {
+                        scoreController.incrementStreak(victor);
+                        scoreController.endStreak(victor === socket.request.user.id ? otherSocket.request.user.id : socket.request.user.id);
+                    }
                     await game.delete();
                 } else {
                     socket.emit("updateGame", game);
