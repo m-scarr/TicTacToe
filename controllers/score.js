@@ -3,7 +3,7 @@ import db from "../models/index.js"
 export default {
     authorized: {
         readHighScores: async (req, res) => {
-            const highScores = await db.Score.findAll({ where: { highScores: 1 } });
+            const highScores = await db.Score.findAll({ where: { highScores: 1 }, order: [['streak', 'DESC']], limit: 20 });
             res.json(highScores);
         },
     },

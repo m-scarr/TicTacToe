@@ -43,7 +43,7 @@ export default (sequelize, DataTypes) => {
         User.hasMany(models.Score, { foreignKey: "userId", as: "scores" });
     };
     User.initializeHooks = (models) => {
-        User.addHook('afterCreate', (user) => {
+        User.afterCreate((user) => {
             models.Score.create({ userId: user.id, highScore: 0 });
             models.Score.create({ userId: user.id, highScore: 1 });
         })
