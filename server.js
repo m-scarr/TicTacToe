@@ -108,7 +108,7 @@ io.on('connect', async (socket) => {
         const game = await Game.get(socket.request.user.id);
         if (game !== null) {
             scoreController.endStreak(socket.request.user.id);
-            const otherSocket = await findSocketByUser(game.players.X === sameUserOtherSocket.request.user.id ? game.players.O : game.players.X);
+            const otherSocket = await findSocketByUser(game.players.X.id === socket.request.user.id ? game.players.O.id : game.players.X.id);
             //socket.request.user loses streak
             if (typeof otherSocket !== "undefined" && otherSocket !== null) {
                 otherSocket.emit("error", "Your opponent left.");
@@ -134,7 +134,7 @@ io.on('connect', async (socket) => {
             const game = await Game.get(socket.request.user.id);
             if (game !== null) {
                 scoreController.endStreak(socket.request.user.id);
-                const otherSocket = await findSocketByUser(game.players.X === socket.request.user.id ? game.players.O : game.players.X);
+                const otherSocket = await findSocketByUser(game.players.X.id === socket.request.user.id ? game.players.O.id : game.players.X.id);
                 if (otherSocket !== null) {
                     otherSocket.emit("error", "Your opponent left.");
                 }

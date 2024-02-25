@@ -16,7 +16,7 @@ export default (socket) => {
                 //check to make sure neither player already has a game
                 await _socket.leave("lobby");
                 await socket.leave("lobby");
-                const newGame = await Game.create(_socket.request.user.id, socket.request.user.id);
+                const newGame = await Game.create({ id: _socket.request.user.id, username: _socket.request.user.username }, { id: socket.request.user.id, username: socket.request.user.username });
                 _socket.emit("gameFound", newGame);
                 socket.emit("gameFound", newGame);
                 break;
@@ -29,13 +29,13 @@ export default (socket) => {
         if (game.checkForTurn(socket.request.user.id)) {
             if (await game.placeSymbol(x, y)) {
                 const victor = game.checkForVictor();
-                const otherSocket = await findSocketByUser(game.players.X === socket.request.user.id ? game.players.O : game.players.X);
+                const otherSocket = await findSocketByUser(game.players.X.id === socket.request.user.id ? game.players.O.id : game.players.X.id);
                 if (victor !== null) {
-                    socket.emit("gameOver", victor === -1 ? null : (victor === socket.request.user.id));
-                    otherSocket.emit("gameOver", victor === -1 ? null : (victor === otherSocket.request.user.id));
+                    socket.emit("gameOver", victor === -1 ? null : (victor.id === socket.request.user.id));
+                    otherSocket.emit("gameOver", victor === -1 ? null : (victor.id === otherSocket.request.user.id));
                     if (victor !== -1) {
-                        scoreController.incrementStreak(victor);
-                        scoreController.endStreak(victor === socket.request.user.id ? otherSocket.request.user.id : socket.request.user.id);
+                        scoreController.incrementStreak(victor.id);
+                        scoreController.endStreak(victor.id === socket.request.user.id ? otherSocket.request.user.id : socket.request.user.id);
                     }
                     await game.delete();
                 } else {

@@ -12,21 +12,21 @@ export class Game {
         O: null
     }
 
-    static async create(player1Id, player2Id) {
-        const gameName = (player1Id > player2Id) ? `${player1Id}_${player2Id}` : `${player2Id}_${player1Id}`;
+    static async create(player1, player2) {
+        const gameName = (player1.id > player2.id) ? `${player1.id}_${player2.id}` : `${player2.id}_${player1.id}`;
         const newGame = new Game();
         newGame.turn = Math.random() < .5 ? "X" : "O";
         if (Math.random < .5) {
-            newGame.players.X = player1Id;
-            newGame.players.O = player2Id;
+            newGame.players.X = player1;
+            newGame.players.O = player2;
         } else {
-            newGame.players.X = player2Id;
-            newGame.players.O = player1Id;
+            newGame.players.X = player2;
+            newGame.players.O = player1;
         }
         console.log("turn: " + newGame.turn);
         await redisClient.set(`/games/${gameName}`, newGame.toString());
-        await redisClient.set(`/users/gameRef/${player1Id}`, gameName);
-        await redisClient.set(`/users/gameRef/${player2Id}`, gameName);
+        await redisClient.set(`/users/gameRef/${player1.id}`, gameName);
+        await redisClient.set(`/users/gameRef/${player2.id}`, gameName);
         return newGame;
     }
 
@@ -53,7 +53,7 @@ export class Game {
         if (x >= 0 && y >= 0 && x < 3 && y < 3 && this.grid[x][y] === null) {
             this.grid[x][y] = this.turn;
             this.turn = (this.turn === "X" ? "O" : "X");
-            const gameName = this.players.O > this.players.X ? `${this.players.O}_${this.players.X}` : `${this.players.X}_${this.players.O}`;
+            const gameName = this.players.O.id > this.players.X.id ? `${this.players.O.id}_${this.players.X.id}` : `${this.players.X.id}_${this.players.O.id}`;
             await redisClient.set(`/games/${gameName}`, this.toString());
             return true;
         }
@@ -61,7 +61,7 @@ export class Game {
     }
 
     checkForTurn(playerId) {
-        return ((this.players.X.toString() === playerId.toString() && this.turn === "X") || (this.players.O.toString() === playerId.toString() && this.turn === "O"))
+        return ((this.players.X.id.toString() === playerId.toString() && this.turn === "X") || (this.players.O.id.toString() === playerId.toString() && this.turn === "O"))
     }
 
     checkForVictor() {
@@ -93,9 +93,9 @@ export class Game {
     }
 
     async delete() {
-        const gameName = this.players.O > this.players.X ? `${this.players.O}_${this.players.X}` : `${this.players.X}_${this.players.O}`;
+        const gameName = this.players.O.id > this.players.X.id ? `${this.players.O.id}_${this.players.X.id}` : `${this.players.X.id}_${this.players.O.id}`;
         await redisClient.del(`/games/${gameName}`);
-        await redisClient.del(`/players/gameRef/${this.players.X.toString()}`);
-        await redisClient.del(`/players/gameRef/${this.players.O.toString()}`);
+        await redisClient.del(`/players/gameRef/${this.players.X.id.toString()}`);
+        await redisClient.del(`/players/gameRef/${this.players.O.id.toString()}`);
     }
 }
