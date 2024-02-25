@@ -33,7 +33,6 @@ export const updateGame = (game: any) => {
 }
 
 export const updateUser = (user: any) => {
-    console.log(user);
     let highScore;
     let currentScore;
     for (let i = 0; i < 2; i++) {

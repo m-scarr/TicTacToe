@@ -1,10 +1,11 @@
 <script lang="ts">
     import API from "../lib/API";
-    import { gridStore } from "../lib/store";
+    import { gridStore, playerStore, userStore } from "../lib/store";
 </script>
 
 <main>
-    game
+    game<br/>
+    opponent: {$playerStore.O.id===$userStore?.id?$playerStore.X.username:$playerStore.O.username}<br/>
     <div class="board">
         {#each $gridStore as row, x}
             <div class="row" style="display: flex; flex-direction:row">
