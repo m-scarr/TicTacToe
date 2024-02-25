@@ -3,7 +3,7 @@ import db from "../models/index.js"
 export default {
     authorized: {
         readHighScores: async (req, res) => {
-            const highScores = await db.Score.findAll({ where: { highScore: 1 }, order: [['streak', 'DESC']], limit: 20, include: [{ model: db.User, as: "user" }] });
+            const highScores = await db.Score.findAll({ where: { highScore: 1 }, order: [['streak', 'DESC']], limit: 20, include: [{ model: db.User, as: "user", attributes: ["id", "username"] }] });
             res.json(highScores);
         },
     },

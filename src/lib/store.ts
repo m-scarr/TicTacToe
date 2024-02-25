@@ -20,6 +20,17 @@ export const turnStore = writable<Symbol | null>(null);
 
 export const userStore = writable<null | User>(null);
 
+export const highScoresStore = writable<{ username: string, streak: number }[]>([]);
+
+export const updateHighScores = (highScores: any[]) => {
+    highScores.forEach((highScore) => {
+        console.log(highScore);
+        highScoresStore.update((val: any) => {
+            return [...val, { username: highScore.user.username, streak: highScore.streak }];
+        })
+    })
+}
+
 export const updateGame = (game: any) => {
     gridStore.set(game.grid);
     const user = get(userStore);

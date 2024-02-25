@@ -66,6 +66,14 @@ export default class API {
     }
 
     static read = {
+        highScores: async () => {
+            try {
+                const result = await axios.get("/auth/score/readHighScores");
+                return result.data;
+            } catch (err) {
+                return [];
+            }
+        }
     }
 
     static update = {
