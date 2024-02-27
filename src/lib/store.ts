@@ -10,7 +10,7 @@ export const gridStore = writable<GameGrid>([
     [null, null, null]
 ]);
 
-export const waitingForOpponent = writable<boolean>(false);
+export const waitingForOpponentStore = writable<boolean>(false);
 
 export const playerSymbolStore = writable<Symbol | null>(null);
 
@@ -23,6 +23,7 @@ export const userStore = writable<null | User>(null);
 export const highScoresStore = writable<{ username: string, streak: number }[]>([]);
 
 export const updateHighScores = (highScores: any[]) => {
+    highScoresStore.set([]);
     highScores.forEach((highScore) => {
         console.log(highScore);
         highScoresStore.update((val: any) => {

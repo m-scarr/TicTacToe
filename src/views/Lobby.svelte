@@ -1,19 +1,25 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import API from "../lib/API";
-    import { highScoresStore, updateHighScores, userStore } from "../lib/store";
+    import {
+        highScoresStore,
+        userStore,
+        waitingForOpponentStore,
+    } from "../lib/store";
 
     onMount(async () => {
-        const result = await API.read.highScores();
-        updateHighScores(result);
+        await API.user.isLoggedIn()
+        await API.read.highScores();
     });
 </script>
 
 <main>
     <button
-        on:click={() => {
-            API.socketActions.readyForGame();
-        }}>Ready For Game</button
+        on:click={API.socketActions.readyForGame}
+        disabled={$waitingForOpponentStore}
+        >{$waitingForOpponentStore
+            ? "Waiting for Opponent"
+            : "Ready for Game!"}</button
     ><br />
     Current Score: {$userStore?.currentScore}<br />
     High Score: {$userStore?.highScore}<br />

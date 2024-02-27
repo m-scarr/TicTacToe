@@ -2,7 +2,7 @@ import axios from "axios";
 import io from 'socket.io-client';
 import generateSocketActions from "./socket/index"
 import { Socket } from "socket.io-client";
-import { updateUser } from "../store";
+import { updateHighScores, updateUser } from "../store";
 
 export default class API {
     static socketActions: any;
@@ -15,10 +15,7 @@ export default class API {
         API.socketActions = generateSocketActions(socket);
         axios.defaults.baseURL = "http://" + window.location.hostname + ":3000";
         axios.defaults.withCredentials = true;
-        const result = await API.user.isLoggedIn();
-        if (result.success) {
-            updateUser(result.user);
-        }
+        await API.user.isLoggedIn();
     }
 
     static user = {
@@ -37,6 +34,9 @@ export default class API {
         isLoggedIn: async () => {
             try {
                 const response = await axios.get("/user/isLoggedIn");
+                if (response.data.success) {
+                    updateUser(response.data.user);
+                }
                 return response.data;
             } catch (err) {
                 console.error(err);
@@ -69,9 +69,10 @@ export default class API {
         highScores: async () => {
             try {
                 const result = await axios.get("/auth/score/readHighScores");
-                return result.data;
+                updateHighScores(result.data);
             } catch (err) {
-                return [];
+                console.error(err);
+                updateHighScores([]);
             }
         }
     }

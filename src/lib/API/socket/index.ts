@@ -1,5 +1,5 @@
 import { Socket } from "socket.io-client";
-import { currentViewStore, playerStore, updateGame, userStore } from "../../store";
+import { currentViewStore, playerStore, updateGame, userStore, waitingForOpponentStore } from "../../store";
 import { View } from "../../types";
 import { get } from "svelte/store";
 //import messageSocketHandlers from "./message.js";
@@ -17,6 +17,7 @@ export default (socket: Socket) => {
     });
 
     socket.on("gameFound", (game) => {
+        waitingForOpponentStore.set(false);
         updateGame(game);
         currentViewStore.set(View.Game);
     });
@@ -32,7 +33,7 @@ export default (socket: Socket) => {
 
     socket.on("error", (err) => {
         alert(err);
-        if (err==="Your opponent left.") {
+        if (err === "Your opponent left.") {
             currentViewStore.set(View.Lobby);
         }
     })
@@ -44,6 +45,8 @@ export default (socket: Socket) => {
         },
         readyForGame: () => {
             socket.emit("readyForGame", null);
+            waitingForOpponentStore.set(true);
+
         },
         takeTurn: (x: number, y: number) => {
             const players = get(playerStore);
