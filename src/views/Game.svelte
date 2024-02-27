@@ -10,7 +10,7 @@
         : $playerStore.O.username}<br />
     {$turnStore !== null && $playerStore[$turnStore].id === $userStore?.id
         ? "Your turn!"
-        : "Waiting for opponent's turn"}
+        : "Waiting for your opponent's turn..."}
     <div class="board">
         {#each $gridStore as row, x}
             <div class="row" style="display: flex; flex-direction:row">
