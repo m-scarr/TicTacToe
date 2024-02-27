@@ -1,11 +1,16 @@
 <script lang="ts">
     import API from "../lib/API";
-    import { gridStore, playerStore, userStore } from "../lib/store";
+    import { gridStore, playerStore, userStore, turnStore } from "../lib/store";
 </script>
 
 <main>
-    game<br/>
-    opponent: {$playerStore.O.id===$userStore?.id?$playerStore.X.username:$playerStore.O.username}<br/>
+    game<br />
+    opponent: {$playerStore.O.id === $userStore?.id
+        ? $playerStore.X.username
+        : $playerStore.O.username}<br />
+    {$turnStore !== null && $playerStore[$turnStore].id === $userStore?.id
+        ? "Your turn!"
+        : "Waiting for opponent"}
     <div class="board">
         {#each $gridStore as row, x}
             <div class="row" style="display: flex; flex-direction:row">
