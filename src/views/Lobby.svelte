@@ -18,7 +18,7 @@
         on:click={API.socketActions.readyForGame}
         disabled={$waitingForOpponentStore}
         >{$waitingForOpponentStore
-            ? "Waiting for Opponent"
+            ? "Waiting for Opponent's move..."
             : "Ready for Game!"}</button
     ><br />
     Current Score: {$userStore?.currentScore}<br />
