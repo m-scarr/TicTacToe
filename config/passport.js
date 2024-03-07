@@ -36,10 +36,11 @@ export default (db) => {
       where: {
         id,
       },
-      attributes: ["id", "username", "profilePic"],
+      attributes: ["id", "username", "profilePic", "role"],
+      include: [{ model: db.Score, as: "scores" }],
     }).then(function (user) {
       if (user !== null) {
-        done(null, { id: user.dataValues.id, username: user.dataValues.username, profilePic: user.dataValues.profilePic, displayName: user.dataValues.displayName, role: user.dataValues.role });
+        done(null, user.toJSON());
       } else {
         console.error(`User ${id} not found for deserialization.`);
         done(new Error("Something went wrong!"));

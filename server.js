@@ -1,6 +1,5 @@
 import express from "express";
 import { createServer } from "http";
-import { createClient } from "redis";
 import redisAdapter from 'socket.io-redis';
 import RedisStore from "connect-redis"
 import session from "express-session";
@@ -16,12 +15,15 @@ import db from "./models/index.js";
 import { Server } from 'socket.io';
 import socketHandlers from './socket_handlers/index.js';
 import { Game } from "./socket_handlers/game.js";
+import scoreController from "./controllers/score.js";
 
 export const redisClient = redis.createClient({
     host: 'localhost',
     port: 6379
 });
+
 await redisClient.connect();
+
 let redisStore = new RedisStore({
     client: redisClient,
     prefix: "tictactoe:",
@@ -105,7 +107,8 @@ io.on('connect', async (socket) => {
 
         const game = await Game.get(socket.request.user.id);
         if (game !== null) {
-            const otherSocket = await findSocketByUser(game.players.X === sameUserOtherSocket.request.user.id ? game.players.O : game.players.X);
+            scoreController.endStreak(socket.request.user.id);
+            const otherSocket = await findSocketByUser(game.players.X.id === socket.request.user.id ? game.players.O.id : game.players.X.id);
             //socket.request.user loses streak
             if (typeof otherSocket !== "undefined" && otherSocket !== null) {
                 otherSocket.emit("error", "Your opponent left.");
@@ -130,7 +133,8 @@ io.on('connect', async (socket) => {
             await redisClient.del(`/users/socket/${socket.request.user.id.toString()}`);
             const game = await Game.get(socket.request.user.id);
             if (game !== null) {
-                const otherSocket = await findSocketByUser(game.players.X === socket.request.user.id ? game.players.O : game.players.X);
+                scoreController.endStreak(socket.request.user.id);
+                const otherSocket = await findSocketByUser(game.players.X.id === socket.request.user.id ? game.players.O.id : game.players.X.id);
                 if (otherSocket !== null) {
                     otherSocket.emit("error", "Your opponent left.");
                 }

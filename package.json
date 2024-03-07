@@ -9,7 +9,7 @@
     "build:dev": "NODE_ENV=dev vite build -m preview",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json",
-    "watch:client": "onchange \"./src/**/*.tsx\" \"./src/**/*.ts\" \"./src/**/*.svelte\" -- vite build",
+    "watch:client": "onchange \"./src/**/*.tsx\" \"./src/**/*.ts\" \"./src/**/*.css\" \"./src/**/*.svelte\" -- vite build",
     "watch:server": "nodemon --watch server.js --watch routes --watch controllers --watch config --watch socket_handlers --watch models --exec node server.js"
   },
   "devDependencies": {

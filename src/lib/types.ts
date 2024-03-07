@@ -1,4 +1,10 @@
-export type User = { id: number; username: string; profilePic: string }
+export type User = { 
+    id: number;
+    username: string;
+    profilePic: string
+    highScore: number;
+    currentScore: number;
+}
 
 export enum View {
     LogIn,

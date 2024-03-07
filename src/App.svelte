@@ -1,4 +1,5 @@
 <script lang="ts">
+    import Header from "./components/Header.svelte";
     import Lobby from "./views/Lobby.svelte";
     import LogIn from "./views/LogIn.svelte";
     import Register from "./views/Register.svelte";
@@ -25,7 +26,8 @@
     }
 </script>
 
-<main>
+<div>
+    <Header />
     {#if $currentViewStore === View.LogIn}
         <LogIn />
     {:else if $currentViewStore === View.Register}
@@ -35,7 +37,7 @@
     {:else if $currentViewStore === View.Game}
         <Game />
     {/if}
-</main>
+</div>
 
 <style>
 </style>

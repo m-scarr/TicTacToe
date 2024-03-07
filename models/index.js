@@ -12,7 +12,7 @@ const sequelize = new Sequelize(
     config[env]
 );
 
-const modelFileNames = ["user"];
+const modelFileNames = ["user", "score"];
 
 for (let i = 0; i < modelFileNames.length; i++) {
     const modelFileName = modelFileNames[i];
