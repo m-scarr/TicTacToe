@@ -1,7 +1,9 @@
 <script lang="ts">
+    import "materialize-css/dist/css/materialize.min.css";
+    import "./index.css";
     import Header from "./components/Header.svelte";
     import Lobby from "./views/Lobby.svelte";
-    import LogIn from "./views/LogIn.svelte";
+    import LogIn from "./views/LogIn.svelte";//
     import Register from "./views/Register.svelte";
     import Game from "./views/Game.svelte";
     import API from "./lib/API";
@@ -15,6 +17,7 @@
     onMount(async () => {
         await API.init();
     });
+
     $: {
         if (
             user !== null &&

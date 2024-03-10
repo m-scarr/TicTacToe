@@ -36,7 +36,9 @@
             alert("Register successful!");
             currentViewStore.set(View.LogIn);
         } else {
-            alert("Register failed, the username or email may already be in use!");
+            alert(
+                "Register failed, the username or email may already be in use!",
+            );
         }
     };
 </script>
@@ -45,18 +47,23 @@
     <div class="register-container">
         <i>Welcome!</i><br />
         <input type="text" placeholder="Username" bind:value={username} />
-        <input
-            type="password"
-            placeholder="Password"
-            bind:value={password}
-        />
+        <input type="password" placeholder="Password" bind:value={password} />
         <input
             type="password"
             placeholder="Verify Password"
             bind:value={verifyPassword}
         />
-        <input type="text" placeholder="E-mail" bind:value={email} />
-        <hr/>
+        <input
+            type="text"
+            placeholder="E-mail"
+            bind:value={email}
+            on:keydown={(e) => {
+                if (e.key === "Enter") {
+                    handleRegister();
+                }
+            }}
+        />
+        <hr />
         <button on:click={handleRegister}>Create Account</button>
         <button
             on:click={() => {
