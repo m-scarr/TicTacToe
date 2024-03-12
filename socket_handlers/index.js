@@ -16,7 +16,9 @@ export default (socket) => {
                 //check to make sure neither player already has a game
                 await _socket.leave("lobby");
                 await socket.leave("lobby");
-                const newGame = await Game.create({ id: _socket.request.user.id, username: _socket.request.user.username }, { id: socket.request.user.id, username: socket.request.user.username });
+                const newGame = await Game.create(
+                    { id: _socket.request.user.id, username: _socket.request.user.username, displayName: _socket.request.user.displayName },
+                    { id: socket.request.user.id, username: socket.request.user.username, displayName: socket.request.user.displayName });
                 _socket.emit("gameFound", newGame);
                 socket.emit("gameFound", newGame);
                 break;
