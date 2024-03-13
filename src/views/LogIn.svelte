@@ -9,9 +9,17 @@
 
 <main>
     <div class="log-in-container">
-        <i>Welcome Back!</i><br/>
+        <i>Welcome Back!</i><br />
         <input type="text" bind:value={username} />
-        <input type="password" bind:value={password} />
+        <input
+            type="password"
+            bind:value={password}
+            on:keydown={(e) => {
+                if (e.key === "Enter") {
+                    API.user.logIn(username, password);
+                }
+            }}
+        />
         <hr />
         <button
             class="log-in-button"

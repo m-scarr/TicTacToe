@@ -14,11 +14,13 @@ export default (sequelize, DataTypes) => {
     Score.associate = (models) => {
         Score.belongsTo(models.User, { foreignKey: "userId", as: "user" });
     };
-    Score.initializeHooks = (models) => {
+    Score.initializeHooks = () => {
         Score.afterUpdate(async (score) => {
-            const highScore = await Score.findOne({ where: { userId: score.dataValues.userId, highScore: 1 } });
-            if (score.dataValues.streak > highScore.dataValues.streak) {
-                await highScore.update({ streak: score.dataValues.streak });
+            if (score.dataValues.highScore === 0) {
+                const highScore = await Score.findOne({ where: { userId: score.dataValues.userId, highScore: 1 } });
+                if (score.dataValues.streak > highScore.dataValues.streak) {
+                    await highScore.update({ streak: score.dataValues.streak });
+                }
             }
         })
     }
