@@ -146,5 +146,5 @@ io.on('connect', async (socket) => {
 
 
 server.listen(port, () => {
-    console.log(`application is running at: http://localhost:${port}`);
+    console.log(`application is running port ${port}`);
 });
